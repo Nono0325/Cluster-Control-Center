@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NonoAI - 異質個人 AI 叢集排程與去中心化兩平面控制台</title>
+  <meta name="description" content="異質個人 AI 叢集之隱私約束排程與去中心化兩平面架構軟體控制台">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Top App Bar -->
+  <header class="app-header" id="app-header">
+    <div class="brand-container">
+      <div class="brand-logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">NonoAI</span>
+      </div>
+      <span class="brand-badge">兩平面異質叢集控制中樞 v1.0</span>
+    </div>
+
+    <div class="header-status" id="cluster-header-status">
+      <div class="status-indicator">
+        <span class="pulse-dot"></span>
+        <span id="header-node-count-text">5 個節點連線中</span>
+      </div>
+      <div class="status-tag tag-lan">局域 mDNS 零配置廣播</div>
+      <div class="status-tag tag-safe">兩平面授權閘門: 啟動中</div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btn-refresh-cluster" onclick="loadClusterNodes()">
+        <span class="btn-icon">🔄</span> 重新整理
+      </button>
+      <button class="btn btn-primary" id="btn-download-plan" onclick="downloadWordPlan()">
+        <span class="btn-icon">📄</span> 下載修訂版計畫書 (Word)
+      </button>
+    </div>
+  </header>
+
+  <!-- Main App Shell -->
+  <main class="app-container">
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="main-navigation">
+      <button class="tab-btn active" id="tab-btn-nodes" onclick="switchTab('nodes')">
+        <span class="tab-icon">🖥️</span> 異質叢集即時拓撲
+      </button>
+      <button class="tab-btn" id="tab-btn-inference" onclick="switchTab('inference')">
+        <span class="tab-icon">🧠</span> 互動式推論排程實驗室
+      </button>
+      <button class="tab-btn" id="tab-btn-benchmarks" onclick="switchTab('benchmarks')">
+        <span class="tab-icon">📊</span> 基準實測與消融分析
+      </button>
+      <button class="tab-btn" id="tab-btn-document" onclick="switchTab('document')">
+        <span class="tab-icon">📑</span> 研究計畫書導覽與編譯
+      </button>
+    </nav>
+
+    <!-- TAB 1: 異質叢集即時拓撲 -->
+    <section class="tab-content active" id="tab-content-nodes">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">異質個人 AI 叢集拓撲與資源監控</h1>
+          <p class="section-subtitle">自動發現局域網路內之高階 GPU 工作站、個人電腦與樹莓派邊緣節點，即時監控視訊記憶體與動態 KV-Cache。</p>
+        </div>
+        <div class="plane-legend">
+          <span class="legend-item"><span class="legend-dot dot-local"></span> 本地推理平面 (LAN)</span>
+          <span class="legend-item"><span class="legend-dot dot-cloud"></span> 隱私授權外部平面 (WAN)</span>
+        </div>
+      </div>
+
+      <!-- Node Cards Grid -->
+      <div class="nodes-grid" id="nodes-container">
+        <!-- Rendered dynamically by app.js -->
+        <div class="loading-spinner">載入叢集節點資訊中...</div>
+      </div>
+
+      <!-- Two-Plane Architecture Banner -->
+      <div class="glass-card two-plane-banner" id="two-plane-overview">
+        <div class="plane-col">
+          <div class="plane-badge badge-green">本地推理平面 (Local Inference Plane)</div>
+          <h3>私有區域網路 (1 Gbps LAN) - 強隱私零洩漏保護</h3>
+          <p>涵蓋 RTX 4090 工作站、RTX 3060 PC、樹莓派 5 與樹莓派 4。透過 mDNS / DNS-SD 廣播節點算力與快取狀態，嚴格禁止未授權機密資料出網。</p>
+        </div>
+        <div class="plane-divider">
+          <div class="shield-badge">🛡️ Consent Gate 授權閘門</div>
+        </div>
+        <div class="plane-col">
+          <div class="plane-badge badge-blue">隱私授權外部平面 (External Plane)</div>
+          <h3>公有雲端高階算力 (Datacenter H100 叢集)</h3>
+          <p>僅接收經過「雙層 LDP 脫敏」之抽象語義草圖或公開任務，負責大規模結構性推論與推測解碼矩陣並行驗證。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: 互動式推論排程實驗室 -->
+    <section class="tab-content" id="tab-content-inference">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">智慧推論排程實驗室</h2>
+          <p class="section-subtitle">即時體驗軟體閘門路由、雙層 LDP 語義草圖協同、SLA 動作遮罩剪枝與 Dueling DDQN 四維延遲分解。</p>
+        </div>
+      </div>
+
+      <div class="inference-layout">
+        <!-- Left: Configuration Form -->
+        <div class="glass-card config-card" id="inference-config-panel">
+          <h3 class="card-title">📝 推論請求參數設定</h3>
+
+          <div class="form-group">
+            <label for="input-prompt">提示詞 (Prompt 內容)：</label>
+            <textarea id="input-prompt" rows="3" class="form-textarea">請查詢王小明使用者 user_id_8821 的 medical_record，並針對今日血壓指數提出健康改善方針。</textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="select-task-type">任務類型：</label>
+              <select id="select-task-type" class="form-select">
+                <option value="LLM_INFERENCE">大型語言模型對話 (LLM Inference)</option>
+                <option value="YOLO_VISION">邊緣電腦視覺追蹤 (YOLOv8 Vision)</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="select-model">目標模型：</label>
+              <select id="select-model" class="form-select">
+                <option value="Llama-3-8B-Q4">Llama-3-8B-Q4 (5.2 GB)</option>
+                <option value="Llama-3-1B-Q4">Llama-3-1B-Q4 (1.2 GB)</option>
+                <option value="Llama-3-70B">Llama-3-70B (40.0 GB)</option>
+                <option value="YOLOv8n">YOLOv8n (0.05 GB)</option>
+                <option value="YOLOv8x">YOLOv8x (0.50 GB)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>隱私保護等級 (Privacy Constraint Level)：</label>
+            <div class="privacy-selector" id="privacy-level-group">
+              <label class="privacy-option">
+                <input type="radio" name="privacy-level" value="0">
+                <span class="option-pill pill-public">
+                  <strong>Level 0: 公開資料</strong>
+                  <small>無敏感資料，可自由運用雲端高速推論</small>
+                </span>
+              </label>
+              <label class="privacy-option">
+                <input type="radio" name="privacy-level" value="1" checked>
+                <span class="option-pill pill-semantic">
+                  <strong>Level 1: 敏感資料 (啟用雙層 LDP)</strong>
+                  <small>含個資/病歷，透過語義草圖雲邊協同</small>
+                </span>
+              </label>
+              <label class="privacy-option">
+                <input type="radio" name="privacy-level" value="2">
+                <span class="option-pill pill-strict">
+                  <strong>Level 2: 極度機密 (強制本地)</strong>
+                  <small>嚴禁封包跨越區域網，強制本地邊緣執行</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="range-tokens">輸入 / 預期生成 Tokens：</label>
+              <div class="token-sliders">
+                <span class="slider-label">輸入: <strong id="val-input-tokens">512</strong></span>
+                <input type="range" id="range-in-tokens" min="64" max="2048" step="64" value="512" oninput="updateTokenVals()">
+                <span class="slider-label">生成: <strong id="val-output-tokens">128</strong></span>
+                <input type="range" id="range-out-tokens" min="16" max="512" step="16" value="128" oninput="updateTokenVals()">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="range-deadline">SLA 截止期限限制 (Deadline): <span class="highlight-val" id="val-deadline">1,200 ms</span></label>
+            <input type="range" id="range-deadline" min="200" max="4000" step="100" value="1200" oninput="updateDeadlineVal()">
+            <div class="slider-ticks">
+              <span>200ms (極緊迫)</span>
+              <span>1200ms (標準互動)</span>
+              <span>4000ms (批次推論)</span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-large btn-full" id="btn-submit-inference" onclick="executeScheduleInference()">
+            <span class="btn-icon">⚡</span> 啟動 Dueling DDQN 智慧排程與推論
+          </button>
+        </div>
+
+        <!-- Right: Execution Feedback & Trace -->
+        <div class="inference-results" id="inference-results-panel">
+          <div class="glass-card result-placeholder" id="result-placeholder">
+            <div class="placeholder-icon">🎯</div>
+            <h3>等待排程指令中</h3>
+            <p>請於左側設定任務規格與隱私約束，點擊啟動按鈕以檢視軟體閘門路由、動作遮罩剪枝與四維延遲分解結果。</p>
+          </div>
+
+          <!-- Dynamic Result Container -->
+          <div class="result-details hidden" id="result-active-container">
+            <!-- Top Summary Banner -->
+            <div class="glass-card result-banner" id="result-summary-card">
+              <div class="summary-metric">
+                <span class="metric-title">選定執行節點</span>
+                <span class="metric-val" id="res-node-name">RTX 4090 工作站</span>
+                <span class="metric-sub" id="res-node-type">本地局域網節點</span>
+              </div>
+              <div class="summary-metric">
+                <span class="metric-title">路由管線模式</span>
+                <span class="metric-val badge-mode" id="res-exec-mode">雲邊語義協同</span>
+                <span class="metric-sub" id="res-mode-desc">雙層 LDP 語義草圖</span>
+              </div>
+              <div class="summary-metric">
+                <span class="metric-title">預測端到端延遲</span>
+                <span class="metric-val" id="res-latency">184.2 ms</span>
+                <span class="metric-sub" id="res-sla-status">✔ SLA 期限達標</span>
+              </div>
+              <div class="summary-metric">
+                <span class="metric-title">隱私約束保障</span>
+                <span class="metric-val text-success" id="res-privacy-status">0% 外洩</span>
+                <span class="metric-sub" id="res-kv-cache">KV-Cache: 0.12 GB</span>
+              </div>
+            </div>
+
+            <!-- Two-Layer LDP Visualization (When applicable) -->
+            <div class="glass-card ldp-card" id="ldp-details-box">
+              <h4 class="box-title">🔒 雙層本地差分隱私 (Two-Layer LDP) 執行過程</h4>
+              <div class="ldp-pipeline-grid">
+                <div class="ldp-step">
+                  <div class="step-badge">1. 實體識別與佔位符遮蔽</div>
+                  <div class="step-content" id="ldp-step1-text">檢測敏感標籤並置換為 &lt;USER_ID_1&gt;, &lt;HEALTH_DATA_2&gt;</div>
+                </div>
+                <div class="ldp-step">
+                  <div class="step-badge">2. 雲端語義草圖生成</div>
+                  <div class="step-content text-mono" id="ldp-step2-text">[SEMANTIC_SKETCH] 分析脫敏提示詞結構...</div>
+                </div>
+                <div class="ldp-step">
+                  <div class="step-badge">3. 雲端抽象骨幹回應</div>
+                  <div class="step-content text-mono" id="ldp-step3-text">雲端完成高層次推理，回傳抽象骨幹框架...</div>
+                </div>
+                <div class="ldp-step">
+                  <div class="step-badge">4. 本地安全記憶體回填重構</div>
+                  <div class="step-content" id="ldp-step4-text">本地私有保險庫取回真實實體完成最終生成！</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Latency Decomposition Breakdown -->
+            <div class="glass-card latency-breakdown-card">
+              <h4 class="box-title">⏱️ 四維延遲分解 (Latency Decomposition Breakdown)</h4>
+              <div class="latency-bars" id="latency-bars-container">
+                <div class="bar-row">
+                  <span class="bar-label">佇列積壓延遲 T_queue</span>
+                  <div class="bar-track"><div class="bar-fill fill-queue" id="bar-queue" style="width: 15%"></div></div>
+                  <span class="bar-val" id="val-tqueue">12.0 ms</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-label">模型載入延遲 T_load (快取感知)</span>
+                  <div class="bar-track"><div class="bar-fill fill-load" id="bar-load" style="width: 0%"></div></div>
+                  <span class="bar-val" id="val-tload">0.0 ms (快取命中)</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-label">網路傳輸延遲 T_trans (LAN / WAN)</span>
+                  <div class="bar-track"><div class="bar-fill fill-trans" id="bar-trans" style="width: 10%"></div></div>
+                  <span class="bar-val" id="val-ttrans">2.5 ms</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-label">推論計算延遲 T_exec (TTFT + TPOT)</span>
+                  <div class="bar-track"><div class="bar-fill fill-exec" id="bar-exec" style="width: 75%"></div></div>
+                  <span class="bar-val" id="val-texec">169.7 ms</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLA Action Masking Candidates Table -->
+            <div class="glass-card table-card">
+              <h4 class="box-title">✂️ SLA 動作遮罩機制 (Action-Masking 剪枝檢視)</h4>
+              <table class="data-table" id="action-mask-table">
+                <thead>
+                  <tr>
+                    <th>節點名稱</th>
+                    <th>預估端到端延遲</th>
+                    <th>SLA 時限 (Deadline)</th>
+                    <th>時限合規判定</th>
+                    <th>兩平面隱私規範</th>
+                    <th>最終動作狀態</th>
+                  </tr>
+                </thead>
+                <tbody id="action-mask-tbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 基準實測與消融分析 -->
+    <section class="tab-content" id="tab-content-benchmarks">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">基準測試數據與學術圖表導覽</h2>
+          <p class="section-subtitle">250 筆混合工作負載對比測試（TTFT、TPOT、P95 延遲、SLA 逾期率與消融實驗）。</p>
+        </div>
+        <button class="btn btn-secondary" onclick="loadBenchmarkSummary()">
+          <span class="btn-icon">📈</span> 刷新實驗圖表
+        </button>
+      </div>
+
+      <!-- Benchmark Metrics Table -->
+      <div class="glass-card table-card" style="margin-bottom: 24px;">
+        <h3 class="card-title">🏆 五大排程機制評估指標對比表 (250 Requests Trace)</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>工作排程策略 / 方法</th>
+              <th>首字延遲 TTFT (ms)</th>
+              <th>每字延遲 TPOT (ms)</th>
+              <th>端到端 P95 尾端延遲 (ms)</th>
+              <th>SLA 逾期率 (%)</th>
+              <th>隱私外洩率 (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight-row">
+              <td><strong>本研究所提 (Dueling DDQN + SLA 遮罩)</strong></td>
+              <td><strong>7,232.1</strong></td>
+              <td><strong>26.7</strong></td>
+              <td><strong>20,591.8</strong></td>
+              <td><span class="badge badge-success">82.4% (最優)</span></td>
+              <td><span class="badge badge-success">0.0% (零外洩)</span></td>
+            </tr>
+            <tr>
+              <td>消融組 (DDQN 去除 SLA 動作遮罩)</td>
+              <td>25,184.2</td>
+              <td>3.9</td>
+              <td>47,386.1</td>
+              <td>94.0%</td>
+              <td><span class="badge badge-danger">30.0% (嚴重外洩)</span></td>
+            </tr>
+            <tr>
+              <td>貪婪延遲基準 (Greedy Latency)</td>
+              <td>5,726.3</td>
+              <td>22.0</td>
+              <td>10,879.2</td>
+              <td>92.4%</td>
+              <td>0.0%</td>
+            </tr>
+            <tr>
+              <td>同質均值槽基準 (Homogeneous Mean Slot - LAS)</td>
+              <td>15,083.9</td>
+              <td>22.6</td>
+              <td>89,075.5</td>
+              <td>88.0%</td>
+              <td>0.0%</td>
+            </tr>
+            <tr>
+              <td>傳統二元路由 (Static Binary Router)</td>
+              <td>27,172.1</td>
+              <td>5.2</td>
+              <td>65,439.6</td>
+              <td>84.8%</td>
+              <td>0.0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Outage Resilience Card -->
+      <div class="glass-card outage-card">
+        <div class="outage-icon">⚡</div>
+        <div class="outage-info">
+          <h3>突發外網斷線容錯驗證 (WAN Outage Resilience)</h3>
+          <p>於第 40 至第 90 筆請求期間模擬突發外部雲端斷線：系統達成 <strong>100% 安全本地收攏</strong>、<strong>0 次隱私外洩</strong>，本地分流接管率達 76.7%！</p>
+        </div>
+      </div>
+
+      <!-- High-Res Figures Gallery -->
+      <h3 class="gallery-title">🖼️ 論文與計畫書專用高解析度圖表展示 (點擊檢視放大)</h3>
+      <div class="figures-gallery" id="figures-gallery-container">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 4: 研究計畫書導覽與編譯 -->
+    <section class="tab-content" id="tab-content-document">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">碩士推甄研究計畫書成果管理</h2>
+          <p class="section-subtitle">檢視公式修復成果、完整學術架構與一鍵編譯下載 Word 檔。</p>
+        </div>
+        <div class="doc-actions">
+          <button class="btn btn-secondary" onclick="recompileWordDoc()">
+            <span class="btn-icon">🔨</span> 重新編譯 Word 檔
+          </button>
+          <button class="btn btn-primary" onclick="downloadWordPlan()">
+            <span class="btn-icon">📥</span> 下載修訂版 Word 檔 (.docx)
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card doc-overview-card">
+        <div class="doc-meta-grid">
+          <div class="meta-item">
+            <span class="meta-lbl">計畫名稱</span>
+            <span class="meta-val">異質個人 AI 叢集之隱私約束排程與去中心化兩平面架構研究</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-lbl">英文名稱</span>
+            <span class="meta-val">Privacy-Constrained Scheduling and Decentralized Two-Plane Architecture for Heterogeneous Personal AI Clusters</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-lbl">申請人 / 學校</span>
+            <span class="meta-val">陳有臨 (You-Lin Chen) ｜ 國立虎尾科技大學 資訊工程系</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-lbl">推甄目標</span>
+            <span class="meta-val">資訊工程研究所 / 資訊管理研究所</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-chapters-grid">
+        <div class="chapter-card glass-card">
+          <h4>壹、研究背景與動機</h4>
+          <p>突破傳統同質均值槽假設破滅與粗粒度二元路由導致的上下文外洩問題，為現代個人異質設備提供高效、合規的推論架構。</p>
+        </div>
+        <div class="chapter-card glass-card">
+          <h4>貳、研究目標與核心問題</h4>
+          <p>構建兩平面架構、研發 SLA 動作遮罩 Dueling DDQN 排程器、實作雙層 LDP 語義草圖與雲邊推測解碼協同管線。</p>
+        </div>
+        <div class="chapter-card glass-card">
+          <h4>參、系統架構與技術方法</h4>
+          <p>完整四維延遲分解、動態 KV-Cache 視訊記憶體開銷公式、Dueling DDQN 價值優勢解耦及 Double DQN 更新方程式。</p>
+        </div>
+        <div class="chapter-card glass-card">
+          <h4>肆、評估計畫與實測數據</h4>
+          <p>包含五大實體設備規格、250 筆混合工作負載對比實驗、消融實驗與外網突發斷線容錯驗證。</p>
+        </div>
+        <div class="chapter-card glass-card">
+          <h4>伍、修課規劃與期程</h4>
+          <p>兩年四學期對應修課（分散式系統、LLM 架構、差分隱私）與實務研發進度甘特里程碑。</p>
+        </div>
+        <div class="chapter-card glass-card">
+          <h4>陸、參考文獻與資源</h4>
+          <p>收錄 AAAI 2026 PRISM、ICLR 2026 PipeSD、CLEAR、NVIDIA PAIR 及 Exo 等前沿文獻標準引用。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Image Lightbox Modal -->
+  <div class="lightbox-modal hidden" id="image-lightbox" onclick="closeLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+      <img id="lightbox-img" src="" alt="放大預覽圖">
+      <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

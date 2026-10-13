@@ -1,0 +1,72 @@
+{
+  "benchmark_summary": {
+    "Proposed_Dueling_DDQN": {
+      "name": "Proposed (Dueling DDQN + SLA Masking)",
+      "total_requests": 250,
+      "ttft_mean": 7232.095674375104,
+      "tpot_mean": 26.74952258625135,
+      "latency_p50": 5334.820764660815,
+      "latency_p95": 20591.810532401527,
+      "latency_mean": 8240.382153375102,
+      "deadline_miss_rate": 82.39999999999999,
+      "privacy_violation_rate": 0.0,
+      "avg_cost": 0.00280329683230448
+    },
+    "Ablation_No_Masking": {
+      "name": "Ablation (w/o SLA Action Masking)",
+      "total_requests": 250,
+      "ttft_mean": 25184.19286734357,
+      "tpot_mean": 3.9324874801229535,
+      "latency_p50": 28563.778330310346,
+      "latency_p95": 47386.086893650725,
+      "latency_mean": 25635.89934634357,
+      "deadline_miss_rate": 94.0,
+      "privacy_violation_rate": 30.0,
+      "avg_cost": 0.03830300034324655
+    },
+    "Greedy_Latency": {
+      "name": "Greedy Earliest Latency",
+      "total_requests": 250,
+      "ttft_mean": 5726.334533830012,
+      "tpot_mean": 22.030873051771277,
+      "latency_p50": 7265.646710435186,
+      "latency_p95": 10879.16619047503,
+      "latency_mean": 6590.577348830013,
+      "deadline_miss_rate": 92.4,
+      "privacy_violation_rate": 0.0,
+      "avg_cost": 0.004823854096394875
+    },
+    "Homogeneous_Mean_Slot": {
+      "name": "Homogeneous Mean Slot (LAS)",
+      "total_requests": 250,
+      "ttft_mean": 15083.870583732029,
+      "tpot_mean": 22.609787985698595,
+      "latency_p50": 4688.643062853258,
+      "latency_p95": 89075.49957269448,
+      "latency_mean": 17483.30670773203,
+      "deadline_miss_rate": 88.0,
+      "privacy_violation_rate": 0.0,
+      "avg_cost": 0.002962713008037787
+    },
+    "Static_Binary_Router": {
+      "name": "Static Binary Router",
+      "total_requests": 250,
+      "ttft_mean": 27172.08273101118,
+      "tpot_mean": 5.191117957592227,
+      "latency_p50": 23261.756929128085,
+      "latency_p95": 65439.570328149566,
+      "latency_mean": 27740.705210011183,
+      "deadline_miss_rate": 84.8,
+      "privacy_violation_rate": 0.0,
+      "avg_cost": 0.008807525868505217
+    }
+  },
+  "outage_summary": {
+    "total_tested": 120,
+    "outage_duration_requests": 50,
+    "privacy_violations": 0,
+    "privacy_leak_rate_percent": 0.0,
+    "fallback_success_rate": 100.0,
+    "local_dispatch_ratio": 76.66666666666667
+  }
+}
